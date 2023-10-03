@@ -34,12 +34,12 @@ const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) 
     const args = APP_ARGS ? APP_ARGS.split(' ') : []
 
     const processStdOut = (data: Buffer) => {
-        // console.log(data.toString().trim())
+        console.log(data.toString().trim())
         onStdOut(data.toString().trim())
     }
 
     const processStdErr = (data: Buffer) => {
-        // console.error(data.toString().trim())
+        console.error(data.toString().trim())
         onStdOut(data.toString().trim())
     }
 
