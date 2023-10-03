@@ -1,15 +1,11 @@
 import express from 'express';
-import { exec, getClientConfig, getLongVersion, getVersion, readDeb } from './exec';
+import { exec, getLongVersion, getVersion, readDeb } from './exec';
 import fs from 'fs';
-import { readdir, rmdir } from 'fs/promises'
+import { readdir } from 'fs/promises'
 
-// import { parse } from '@toml-tools/parser';
 import { API_PORT, APP_BINARY, BUILD_CMD, BUILD_OUTPUT, DAEMON_HOME, SRC_DIR } from './config';
 import { parse } from '@iarna/toml';
 import axios from 'axios';
-//@ts-ignore
-import debreader from 'deb-reader';
-import ar from 'ar';
 
 export const runServer = () => {
     if (!API_PORT) throw new Error('API_PORT is undefined')
