@@ -19,7 +19,8 @@
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.1",
     "tsc": "^2.0.4",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "postject": "^1.0.0-alpha.6"
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
