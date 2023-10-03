@@ -13,7 +13,9 @@ export const runServer = () => {
 
     const server = express();
     server.get('/', (req, res) => {
-        res.send('Hello World!')
+        const links = ['/version', '/config', '/config/client', '/config/app', '/upgrade_info', '/log', '/cosmovisor', '/cosmovisor/:version', '/cosmovisor/import_deb?url=_&version=_&force=_', '/cosmovisor/import_src?tag=_&version=_&force=_', '/restart']
+        const anchors = links.map(link=>`<a href="${link}">${link}</a>`)
+        res.send(`<div><br/>${anchors.join('<br />')}</div>`)
     });
 
     server.get('/version', async (req, res) => {
