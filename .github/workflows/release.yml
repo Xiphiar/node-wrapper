@@ -20,15 +20,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - run: sudo apt install libarchive-dev
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build
-    - run: npm test
-    - run: npm run seaprep
+        cache: 'yarn'
+    - run: yarn seaprep
     - run: cp $(command -v node) nodewrap
     - run: npx postject nodewrap NODE_SEA_BLOB sea-prep.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
     - uses: actions/upload-artifact@v3
