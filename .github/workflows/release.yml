@@ -29,7 +29,7 @@ jobs:
     - run: yarn
     - run: yarn seaprep
     - run: cp $(command -v node) nodewrap
-    - run: npx postject nodewrap NODE_SEA_BLOB sea-prep.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
+    - run: npx postject nodewrap NODE_SEA_BLOB esbuild/sea-prep.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
     - uses: actions/upload-artifact@v3
       with:
         name: nodewrap
