@@ -1,0 +1,4 @@
+{
+    "main": "esbuild/build.js",
+    "output": "esbuild/sea-prep.blob"
+  }
