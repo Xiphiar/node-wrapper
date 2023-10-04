@@ -126,3 +126,7 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+
+sea-build.js
+sea-build.blob
