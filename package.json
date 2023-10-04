@@ -1,5 +1,5 @@
 {
-  "name": "node-wrapper",
+  "name": "nodewrap",
   "version": "1.0.0",
   "main": "cmd.ts",
   "license": "MIT",
