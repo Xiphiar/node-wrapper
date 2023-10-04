@@ -1,9 +1,9 @@
 import { Command } from 'commander';
 import figlet from 'figlet';
 import { startWrapper } from './wrapper';
-import * as Config from './config'
+import {config} from './config'
 import { unsafeResetAll } from './exec';
-import { getApp, getConfig, saveApp, saveConfig } from './toml';
+import { getApp, getConfig, getWrapConfig, saveApp, saveConfig } from './toml';
 import axios from 'axios';
 import { getBlock, getChainRegistry } from './getters';
 import { findGoodRpc } from './helpers';
@@ -28,31 +28,29 @@ program.command('start')
     });
 
 program.command('config')
-    .description('Prints current env config')
+    .description('Prints current config')
     .action((str, options) => {
         try {
-            Object.entries(Config).forEach(c=>{
-                console.log(`${c[0]} = ${c[1]}`)
-            })
+            console.table(config)
         } catch(e: any) {
-            console.error('Failed to get env config:', e.toString())
+            console.error('Failed to get config:', e.toString())
         }
     });
 
 program.command('statesync')
     .description('Configure statesync for a node')
     .option('--rpc <url>', 'RPC url to use for statesync')
-    .option('--directory <name>', 'Cosmos Directory chain name to use if RPC is not defined')
+    .option('--chain <name>', 'Cosmos Directory chain name to use if RPC is not defined')
     .option('--reset', 'Optional. Also perform an unsafe reset of all data')
     .action(async (options, command: Command) => {
-        if (!options.rpc && !options.directory) {
-            console.error('Either --rpc or --directory is required.\n')
+        if (!options.rpc && !options.chain) {
+            console.error('Either --rpc or --chain is required.\n')
             command.help({error: true})
         }
         try {
             let rpc = options.rpc;
             if (!rpc) {
-                rpc = await findGoodRpc(options.directory)
+                rpc = await findGoodRpc(options.chain)
                 console.log('RPC!', rpc)
             }
 
@@ -76,9 +74,9 @@ program.command('statesync')
             config.statesync.discovery_time = '30s';
 
             saveConfig(config);
-            console.log(`Statesync configured, ready to start!`)
             console.log(`Trust Height: ${ssHeight}`)
             console.log(`Trust Hash: ${ssHash}`)
+            console.log(`Statesync configured, ready to start!`)
 
         } catch(e: any) {
             console.error('Error:', e.toString())
@@ -87,11 +85,11 @@ program.command('statesync')
 
 program.command('seeds')
     .description('Configure seeds for a node')
-    .requiredOption('--directory <name>', 'Cosmos Directory chain name to use')
+    .requiredOption('--chain <name>', 'Cosmos Directory chain name to use')
     .action(async (options, command: Command) => {
         try {
 
-            const registry = await getChainRegistry(options.directory)
+            const registry = await getChainRegistry(options.chain)
             const seeds = registry.peers.seeds.map((s: any)=>`${s.id}@${s.address}`);
             const peers = registry.peers.persistent_peers.map((s: any)=>`${s.id}@${s.address}`);
             console.log(`Found ${seeds.length} seeds and ${peers.length} peers`)
@@ -99,12 +97,14 @@ program.command('seeds')
             console.log(seeds)
             if (seeds.length){
                 config.p2p.seeds = seeds.join(',')
+                console.log(`Seeds configured!`)
             } else if (peers.length) {
                 config.p2p.persistent_peers = peers.join(',')
+                console.log(`Peers configured!`)
             }
 
             saveConfig(config);
-            console.log(`Seeds/peers configured!`)
+            
 
         } catch(e: any) {
             console.error('Error:', e.toString())
@@ -160,7 +160,7 @@ program.command('setup')
 
             saveApp(app)
 
-            console.log(`Seeds/peers configured!`)
+            console.log(`Node configured as API node on IP ${BIND_ADDR}\nReady to start!`)
 
         } catch(e: any) {
             console.error('Error:', e.toString())

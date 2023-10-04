@@ -3,14 +3,14 @@ import { exec, getLongVersion, getVersion, readDeb } from './exec';
 import fs from 'fs';
 import { readdir } from 'fs/promises'
 
-import { API_PORT, APP_BINARY, BUILD_CMD, BUILD_OUTPUT, DAEMON_HOME, SRC_DIR } from './config';
 import { parse } from '@iarna/toml';
 import axios from 'axios';
 import { getConfig } from './toml';
+import { config } from './config';
 
 export const runServer = () => {
-    if (!API_PORT) throw new Error('API_PORT is undefined')
-    const port = API_PORT;
+    if (!config.api_port) throw new Error('config.api_port is undefined')
+    const port = config.api_port;
 
     const server = express();
     server.get('/', (req, res) => {
@@ -31,7 +31,7 @@ export const runServer = () => {
 
     server.get('/config/app', async (req, res) => {
         try {
-            const toml = fs.readFileSync(`${DAEMON_HOME}/config/app.toml`)
+            const toml = fs.readFileSync(`${config.app_home}/config/app.toml`)
             const parsed = parse(toml.toString());
             res.json(parsed)
         } catch {
@@ -40,14 +40,14 @@ export const runServer = () => {
     });
 
     server.get('/config', async (req, res) => {
-        const toml = fs.readFileSync(`${DAEMON_HOME}/config/config.toml`)
+        const toml = fs.readFileSync(`${config.app_home}/config/config.toml`)
         const parsed = parse(toml.toString());
         res.json(parsed)
     });
 
     server.get('/upgrade_info', async (req, res) => {
         try {
-            const json = fs.readFileSync(`${DAEMON_HOME}/data/upgrade_info.json`)
+            const json = fs.readFileSync(`${config.app_home}/data/upgrade_info.json`)
             const parsed = JSON.parse(json.toString());
             res.json(parsed)
         } catch {
@@ -57,7 +57,7 @@ export const runServer = () => {
 
     server.get('/cosmovisor', async (req, res) => {
         try {
-            const children = await readdir(`${DAEMON_HOME}/cosmovisor/upgrades`, {
+            const children = await readdir(`${config.app_home}/cosmovisor/upgrades`, {
                 withFileTypes: true
             })
             const dirs = children.filter(c=>c.isDirectory()).map(c=>{
@@ -83,7 +83,7 @@ export const runServer = () => {
             return;
         }
 
-        const dir = `${DAEMON_HOME}/cosmovisor/upgrades/${version}`
+        const dir = `${config.app_home}/cosmovisor/upgrades/${version}`
         const binDir = `${dir}/bin`
         try {
             if (fs.existsSync(dir)){
@@ -144,8 +144,8 @@ export const runServer = () => {
         const version = req.query.version as string;
         const force = req.query.force === 'true';
 
-        if (!SRC_DIR || !fs.existsSync(SRC_DIR)) {
-            res.status(400).send(`Config variable SRC_DIR not specified or does not exist: ${SRC_DIR}`);
+        if (!config.src_dir || !fs.existsSync(config.src_dir)) {
+            res.status(400).send(`Config variable config.src_dir not specified or does not exist: ${config.src_dir}`);
             return;
         }
         if (!version) {
@@ -157,7 +157,7 @@ export const runServer = () => {
             return;
         }
 
-        const dir = `${DAEMON_HOME}/cosmovisor/upgrades/${version}`
+        const dir = `${config.app_home}/cosmovisor/upgrades/${version}`
         const binDir = `${dir}/bin`
         try {
             if (fs.existsSync(dir)){
@@ -178,16 +178,16 @@ export const runServer = () => {
         }
 
         try {
-            const fetch = await exec(`(cd ${SRC_DIR}; git fetch)`)
+            const fetch = await exec(`(cd ${config.src_dir}; git fetch)`)
             console.log(fetch)
 
-            const checkout = await exec(`(cd ${SRC_DIR}; git checkout ${tag})`)
+            const checkout = await exec(`(cd ${config.src_dir}; git checkout ${tag})`)
             console.log(fetch)
 
-            const build = await exec(`(cd ${SRC_DIR}; ${BUILD_CMD})`)
+            const build = await exec(`(cd ${config.src_dir}; ${config.build_cmd})`)
             console.log(build)
 
-            await exec(`cp ${BUILD_OUTPUT} ${binDir}`)
+            await exec(`cp ${config.build_output}/${config.app_binary} ${binDir}`)
 
             const version = await getLongVersion(`${binDir}/secretd`)
             res.json({version})
@@ -204,10 +204,10 @@ export const runServer = () => {
                 res.status(400).send("Invalid Version");
                 return;
             }
-            const upgradeDir = `${DAEMON_HOME}/cosmovisor/upgrades/${req.params.version}/bin`
+            const upgradeDir = `${config.app_home}/cosmovisor/upgrades/${req.params.version}/bin`
             const files = await readdir(upgradeDir)
             
-            const version = await getVersion(`${upgradeDir}/${APP_BINARY}`)
+            const version = await getVersion(`${upgradeDir}/${config.app_binary}`)
             res.json({version, files})
         } catch {
             res.status(404).send("Version Not Found");
