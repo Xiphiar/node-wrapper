@@ -100,3 +100,11 @@ export const getClientConfig = async () => {
     // idfk
     return JSON.parse(stderr.replace('node', '_node'));
 }
+
+export const unsafeResetAll = async () => {
+    const {stdout, stderr} = await exec(`${APP_BINARY} tendermint unsafe-reset-all --keep-addr-book`)
+    console.log(stdout, stderr)
+
+    // idfk
+    return stdout;
+}

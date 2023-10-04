@@ -6,6 +6,7 @@ import { readdir } from 'fs/promises'
 import { API_PORT, APP_BINARY, BUILD_CMD, BUILD_OUTPUT, DAEMON_HOME, SRC_DIR } from './config';
 import { parse } from '@iarna/toml';
 import axios from 'axios';
+import { getConfig } from './toml';
 
 export const runServer = () => {
     if (!API_PORT) throw new Error('API_PORT is undefined')
@@ -25,9 +26,7 @@ export const runServer = () => {
     });
 
     server.get('/config/client', async (req, res) => {
-        const toml = fs.readFileSync(`${DAEMON_HOME}/config/client.toml`)
-        const parsed = parse(toml.toString());
-        res.json(parsed)
+        res.json(getConfig())
     });
 
     server.get('/config/app', async (req, res) => {

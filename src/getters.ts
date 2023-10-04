@@ -1,0 +1,13 @@
+import axios from "axios"
+
+export const getChainRegistry = async(registryId: string) => {
+    const {data} = await axios.get(`https://raw.githubusercontent.com/cosmos/chain-registry/master/${registryId}/chain.json`);
+    return data;
+}
+
+
+export const getBlock = async (rpc: string, height?: string | number) => {
+    const url = `${rpc.replace(/\/$/, '')}/block?height=${height || ''}`
+    const {data} = await axios.get(url, { timeout: 1_500 });
+    return data;
+}

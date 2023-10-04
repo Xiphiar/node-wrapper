@@ -7,9 +7,7 @@ const convert = new Convert();
 String.prototype.trim = function() {
     return this.replace(/^\s+|\s+$/g, "");
 };
-
-(async ()=>{
-
+export const startWrapper = () => {
     const logBuffer = new LogBuffer();
 
     const server = runServer();
@@ -24,5 +22,4 @@ String.prototype.trim = function() {
         app.restart()
         res.send('Ok')
     });
-
-})();
+}
