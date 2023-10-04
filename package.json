@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "main": "cmd.ts",
   "license": "MIT",
+  "bin": {
+    "@xiphiar/nodewrap": "build/cmd.js",
+    "nodewrap": "build/cmd.js"
+},
   "scripts": {
     "start": "ts-node ./src/cmd.ts",
     "build": "rimraf ./build && tsc",
