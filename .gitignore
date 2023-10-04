@@ -129,4 +129,5 @@ dist
 
 
 sea-build.js
-sea-build.blob
+sea-prep.blob
+nodewrap
