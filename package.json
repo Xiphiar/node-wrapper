@@ -4,8 +4,8 @@
   "main": "src/cmd/index.ts",
   "license": "MIT",
   "bin": {
-    "@xiphiar/nodewrap": "build/cmd.js",
-    "nodewrap": "build/cmd.js"
+    "@xiphiar/nodewrap": "build/cmd/index.js",
+    "nodewrap": "build/cmd/index.js"
 },
   "scripts": {
     "start": "ts-node ./src/cmd/index.ts",
