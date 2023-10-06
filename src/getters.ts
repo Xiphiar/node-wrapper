@@ -1,7 +1,11 @@
 import axios from "axios"
 
 export const getChainRegistry = async(registryId: string) => {
-    const {data} = await axios.get(`https://raw.githubusercontent.com/cosmos/chain-registry/master/${registryId}/chain.json`);
+    const url = registryId.includes('testnet') ?
+        `https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/${registryId}/chain.json`
+    :
+        `https://raw.githubusercontent.com/cosmos/chain-registry/master/${registryId}/chain.json`
+    const {data} = await axios.get(url);
     return data;
 }
 

@@ -1,16 +1,16 @@
 {
   "name": "nodewrap",
-  "version": "1.0.0",
-  "main": "cmd.ts",
+  "version": "0.0.4",
+  "main": "src/cmd/index.ts",
   "license": "MIT",
   "bin": {
     "@xiphiar/nodewrap": "build/cmd.js",
     "nodewrap": "build/cmd.js"
 },
   "scripts": {
-    "start": "ts-node ./src/cmd.ts",
+    "start": "ts-node ./src/cmd/index.ts",
     "build": "rimraf ./build && tsc",
-    "esbuild": "rimraf ./esbuild && esbuild src/cmd.ts --bundle --platform=node --outfile=esbuild/build.js",
+    "esbuild": "rimraf ./esbuild && esbuild src/cmd/index.ts --bundle --platform=node --outfile=esbuild/build.js",
     "seaprep": "npm run esbuild && node --experimental-sea-config sea-config.json",
     "dev": "nodemon",
     "test": "echo 'No Test Defined'"
