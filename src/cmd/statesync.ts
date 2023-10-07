@@ -25,7 +25,7 @@ export const statesyncCommand = new Command('statesync')
             const latest = await getBlock(rpc);
 
             const latestHeight = parseInt(latest.result.block.header.height)
-            const ssHeight = Math.round((latestHeight - 1000)/1000)*1000
+            const ssHeight = Math.round((latestHeight - 3000)/1000)*1000
             const {data: ssBlock} = await axios.get(`${rpc.replace(/\/$/, '')}/block?height=${ssHeight}`);
             const ssHash = ssBlock.result.block_id.hash
 
