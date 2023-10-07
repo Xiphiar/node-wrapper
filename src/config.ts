@@ -8,6 +8,7 @@ export class Config {
     'src_dir': string = '';
     'build_cmd': string = 'make install';
     'build_output': string = `${process.env.HOME}/go/bin`;
+    'hide_log_p2p_info': boolean = true;
 }
 
 

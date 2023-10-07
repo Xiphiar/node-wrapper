@@ -35,8 +35,12 @@ const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) 
     const args = config.app_args ? config.app_args.split(' ') : []
 
     const processStdOut = (data: Buffer) => {
-        console.log(data.toString().trim())
-        onStdOut(data.toString().trim())
+        const entry = data.toString().trim()
+
+        if (config.hide_log_p2p_info || true && entry.includes('module=p2p') && entry.includes(' INF ')) return;
+
+        console.log(entry)
+        onStdOut(entry)
     }
 
     const processStdErr = (data: Buffer) => {
