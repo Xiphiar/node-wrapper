@@ -36,7 +36,7 @@ program.command('config')
     .option('--chain <name>', 'Configure based on cosmos directory chain')
     .action(async (options, command: Command) => {
         try {
-            const config = getWrapConfig();
+            const config = getWrapConfig(false);
 
             if (!options.chain) {
                 console.table(config)

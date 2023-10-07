@@ -3,7 +3,7 @@ import { promisify } from 'node:util'
 import { ChildProcessWithoutNullStreams, exec as _exec, spawn } from "node:child_process";
 //@ts-ignore
 import debreader from 'deb-reader';
-import { config } from './config';
+import { getWrapConfig } from './toml';
 
 export const exec = promisify(_exec);
 
@@ -30,6 +30,7 @@ export const readDeb = (path: string): Promise<{controlFile: any, fileList: stri
 }
 
 const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) => {
+    const config = getWrapConfig();
     const bin = config.app_binary
     const args = config.app_args ? config.app_args.split(' ') : []
 
@@ -83,18 +84,18 @@ export class RunApp {
     }
 }
 
-export const getVersion = async (path: string = config.app_binary) => {
+export const getVersion = async (path: string = getWrapConfig().app_binary) => {
     const {stdout} = await exec(`${path} version`)
     return stdout.trim()
 }
 
-export const getLongVersion = async (path: string = config.app_binary) => {
+export const getLongVersion = async (path: string = getWrapConfig().app_binary) => {
     const {stdout} = await exec(`${path} version --long --output json`)
     return JSON.parse(stdout);
 }
 
 export const getClientConfig = async () => {
-    const {stdout, stderr} = await exec(`${config.app_binary} config`)
+    const {stdout, stderr} = await exec(`${getWrapConfig().app_binary} config`)
     console.log(stdout, stderr)
 
     // idfk
@@ -102,7 +103,7 @@ export const getClientConfig = async () => {
 }
 
 export const unsafeResetAll = async () => {
-    const {stdout, stderr} = await exec(`${config.app_binary} tendermint unsafe-reset-all --keep-addr-book`)
+    const {stdout, stderr} = await exec(`${getWrapConfig().app_binary} tendermint unsafe-reset-all --keep-addr-book`)
     console.log(stdout, stderr)
 
     // idfk

@@ -5,10 +5,10 @@ import { readdir } from 'fs/promises'
 
 import { parse } from '@iarna/toml';
 import axios from 'axios';
-import { getConfig } from './toml';
-import { config } from './config';
+import { getConfig, getWrapConfig } from './toml';
 
 export const runServer = () => {
+    const config = getWrapConfig()
     if (!config.api_port) throw new Error('config.api_port is undefined')
     const port = config.api_port;
 
