@@ -33,9 +33,10 @@ export const saveApp = (newApp: AppToml) => {
 }
 
 
+const configDir = `${process.env.HOME}/.nodewrap`
+const configToml = `${configDir}/config.toml`
+
 export const getWrapConfig = () => {
-    const configDir = `${process.env.HOME}/.nodewrap`
-    const configToml = `${configDir}/config.toml`
     if (!fs.existsSync(configDir)){
         fs.mkdirSync(configDir);
     }
@@ -49,7 +50,12 @@ export const getWrapConfig = () => {
     } else {
         const toml = fs.readFileSync(configToml)
         const parsed = parse(toml.toString());
-        return parsed;
+        return parsed as unknown as Config;
     }
+}
 
+export const saveWrapConfig = (newConfig: Config) => {
+    //@ts-ignore
+    const toml = stringify(newConfig);
+    fs.writeFileSync(configToml, toml);
 }

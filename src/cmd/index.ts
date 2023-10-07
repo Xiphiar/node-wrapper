@@ -3,9 +3,8 @@
 import { Command } from 'commander';
 import figlet from 'figlet';
 import { startWrapper } from '../wrapper';
-import {config} from '../config'
 import { unsafeResetAll } from '../exec';
-import { getApp, getConfig, getWrapConfig, saveApp, saveConfig } from '../toml';
+import { getApp, getConfig, getWrapConfig, saveApp, saveConfig, saveWrapConfig } from '../toml';
 import axios from 'axios';
 import { getBlock, getChainRegistry } from '../getters';
 import { findGoodRpc } from '../helpers';
@@ -34,14 +33,27 @@ program.command('start')
 
 program.command('config')
     .description('Prints current config')
-    .action((str, options) => {
+    .option('--chain <name>', 'Configure based on cosmos directory chain')
+    .action(async (options, command: Command) => {
         try {
-            console.table(config)
+            const config = getWrapConfig();
+
+            if (!options.chain) {
+                console.table(config)
+                return;
+            }
+
+            const registry = await getChainRegistry(options.chain);
+            
+            config.app_binary = registry.daemon_name
+            config.app_home = registry.node_home.replace('$HOME', process.env.HOME)
+
+            saveWrapConfig(config);
+            console.table(config);
         } catch(e: any) {
             console.error('Failed to get config:', e.toString())
         }
     });
-
 
 
 program.addCommand(setupCommand)

@@ -116,7 +116,7 @@ export type ConfigToml = {
     }
   }
   
-  export type AppToml = {
+export type AppToml = {
     "minimum-gas-prices": string
     pruning: string
     "pruning-keep-recent": string
