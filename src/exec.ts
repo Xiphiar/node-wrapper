@@ -44,8 +44,13 @@ const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) 
     }
 
     const processStdErr = (data: Buffer) => {
-        console.error(data.toString().trim())
-        onStdOut(data.toString().trim())
+        const entry = data.toString().trim()
+
+        if (config.hide_log_p2p_info || true && entry.includes('module=p2p') && entry.includes(' INF ')) return;
+
+        // All node output is on stderr 🤷 
+        console.log(entry)
+        onStdOut(entry)
     }
 
     console.log('Starting App', bin, args.join(' '))
