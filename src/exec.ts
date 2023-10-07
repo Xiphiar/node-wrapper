@@ -37,7 +37,7 @@ const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) 
     const processStdOut = (data: Buffer) => {
         const entry = data.toString().trim()
 
-        if (config.hide_log_p2p_info || true && entry.includes('module=p2p') && entry.includes(' INF ')) return;
+        if (config.hide_log_p2p_info && entry.includes('module=p2p') && entry.includes(' INF ')) return;
 
         console.log(entry)
         onStdOut(entry)
@@ -46,7 +46,7 @@ const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) 
     const processStdErr = (data: Buffer) => {
         const entry = data.toString().trim()
 
-        if (config.hide_log_p2p_info || true && entry.includes('module=p2p') && entry.includes(' INF ')) return;
+        if (config.hide_log_p2p_info && entry.includes('module=p2p') && entry.includes(' INF ')) return;
 
         // All node output is on stderr 🤷 
         console.log(entry)
