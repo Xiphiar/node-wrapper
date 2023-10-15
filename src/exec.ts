@@ -31,7 +31,7 @@ export const readDeb = (path: string): Promise<{controlFile: any, fileList: stri
 
 const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) => {
     const config = getWrapConfig();
-    const bin = config.app_binary
+    const bin = config.app_binary_path
     const args = config.app_args ? config.app_args.split(' ') : []
 
     const processStdOut = (data: Buffer) => {

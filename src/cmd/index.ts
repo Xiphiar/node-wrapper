@@ -3,7 +3,7 @@
 import { Command } from 'commander';
 import figlet from 'figlet';
 import { startWrapper } from '../wrapper';
-import { unsafeResetAll } from '../exec';
+import execShellCommand, { unsafeResetAll } from '../exec';
 import { getApp, getConfig, getWrapConfig, saveApp, saveConfig, saveWrapConfig } from '../toml';
 import axios from 'axios';
 import { getBlock, getChainRegistry } from '../getters';
@@ -44,8 +44,10 @@ program.command('config')
             }
 
             const registry = await getChainRegistry(options.chain);
+            const location = await execShellCommand(`which ${registry.daemon_name}`)
             
             config.app_binary = registry.daemon_name
+            config.app_binary_path = location.stdout.replace('\n', '')
             config.app_home = registry.node_home.replace('$HOME', process.env.HOME)
 
             saveWrapConfig(config);

@@ -63,6 +63,7 @@ export const getWrapConfig = (verify = true): Config => {
     if (verify){
         if (!returnConfig.api_port) throw new Error('Config value api_port is undefined')
         if (!returnConfig.app_binary) throw new Error('Config value app_binary is undefined')
+        if (!returnConfig.app_binary_path) throw new Error('Config value app_binary_path is undefined')
         if (!returnConfig.app_home) throw new Error('Config value app_home is undefined')
     }
 
