@@ -53,7 +53,7 @@ program.command('config')
             config.app_home = registry.node_home.replace('$HOME', process.env.HOME)
 
             if (options.cosmovisor){
-                const cLocation = await execShellCommand(`which ${registry.daemon_name}`)
+                const cLocation = await execShellCommand(`which cosmovisor`)
 
                 config.app_binary = 'cosmovisor'
                 config.app_start_subcommand = 'run start'
