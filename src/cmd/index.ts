@@ -34,6 +34,7 @@ program.command('start')
 program.command('config')
     .description('Prints current config')
     .option('--chain <name>', 'Configure based on cosmos directory chain')
+    .option('--cosmovisor', 'Use cosmovisor for the binary')
     .action(async (options, command: Command) => {
         try {
             const config = getWrapConfig(false);
@@ -47,8 +48,17 @@ program.command('config')
             const location = await execShellCommand(`which ${registry.daemon_name}`)
             
             config.app_binary = registry.daemon_name
+            config.app_start_subcommand = 'start'
             config.app_binary_path = location.stdout.replace('\n', '')
             config.app_home = registry.node_home.replace('$HOME', process.env.HOME)
+
+            if (options.cosmovisor){
+                const cLocation = await execShellCommand(`which ${registry.daemon_name}`)
+
+                config.app_binary = 'cosmovisor'
+                config.app_start_subcommand = 'run start'
+                config.app_binary_path = cLocation.stdout.replace('\n', '')
+            }
 
             saveWrapConfig(config);
             console.table(config);

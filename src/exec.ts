@@ -32,6 +32,7 @@ export const readDeb = (path: string): Promise<{controlFile: any, fileList: stri
 const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) => {
     const config = getWrapConfig();
     const bin = config.app_binary_path
+    const command = config.app_start_subcommand || 'start'
     const args = config.app_args ? config.app_args.split(' ') : []
 
     const processStdOut = (data: Buffer) => {
@@ -54,7 +55,7 @@ const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) 
     }
 
     console.log('Starting App', bin, args.join(' '))
-    const app = spawn(bin, ['start', ...args]);
+    const app = spawn(bin, [command, ...args]);
 
     app.stdout.on('data', processStdOut);
     app.stderr.on('data', processStdErr);

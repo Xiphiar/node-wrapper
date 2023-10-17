@@ -5,6 +5,8 @@ export const getChainRegistry = async(registryId: string) => {
         `https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/${registryId}/chain.json`
     :
         `https://raw.githubusercontent.com/cosmos/chain-registry/master/${registryId}/chain.json`
+        
+    console.log(url)
     const {data} = await axios.get(url);
     return data;
 }

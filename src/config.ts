@@ -4,6 +4,7 @@ export class Config {
     'api_port': string = '26670'
     'app_binary': string = '';
     'app_binary_path': string = '';
+    'app_start_subcommand': string = 'start'
     'app_args': string = '';
     'app_home': string = '';
     'src_dir': string = '';
