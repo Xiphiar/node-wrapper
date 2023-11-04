@@ -83,7 +83,9 @@ const validatorCmd = new Command('validator')
             config.p2p.max_num_inbound_peers = 100
             config.p2p.max_num_outbound_peers = 25
 
-            config.storage.discard_abci_responses = true
+            if (typeof(config.storage?.discard_abci_responses) !== 'undefined') {
+                config.storage.discard_abci_responses = true
+            }
             config.tx_index.indexer = 'null'
 
             config.instrumentation.prometheus_listen_addr = `:${METRICS}`
