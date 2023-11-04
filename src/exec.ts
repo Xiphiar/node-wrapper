@@ -4,6 +4,7 @@ import { ChildProcessWithoutNullStreams, exec as _exec, spawn } from "node:child
 //@ts-ignore
 import debreader from 'deb-reader';
 import { getWrapConfig } from './toml';
+import { setupStatesync } from './cmd/statesync';
 
 export const exec = promisify(_exec);
 
@@ -78,6 +79,7 @@ export class RunApp {
     private child: ChildProcessWithoutNullStreams;
     private onStdOut: (data: string)=>void;
     private onStdErr: (data: string)=>void;
+    private wrapConfig = getWrapConfig();
 
     constructor(onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) {
         this.child = runApp(onStdOut, onStdErr)
@@ -88,12 +90,27 @@ export class RunApp {
         this.restart = this.restart.bind(this)
     }
 
+    private handleErrLog = (logEntry: string) => {
+        this.onStdErr(logEntry)
+
+        if ((this.wrapConfig.auto_recover || false) && logEntry.includes('ERR CONSENSUS FAILURE!!!')) {
+            this.stop();
+            setupStatesync(this.wrapConfig.registry_id, undefined, true).then(()=>{
+                this.start()
+            });
+        }
+    }
+
     private start() {
-        this.child = runApp(this.onStdOut, this.onStdErr)
+        this.child = runApp(this.onStdOut, this.handleErrLog)
+    }
+
+    private stop() {
+        this.child.kill()
     }
 
     restart() {
-        this.child.kill()
+        this.stop()
         this.start()
     }
 }

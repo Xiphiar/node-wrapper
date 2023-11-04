@@ -51,6 +51,7 @@ program.command('config')
             config.app_start_subcommand = 'start'
             config.app_binary_path = location.stdout.replace('\n', '')
             config.app_home = registry.node_home.replace('$HOME', process.env.HOME)
+            config.registry_id = options.chain
 
             if (options.cosmovisor){
                 const cLocation = await execShellCommand(`which cosmovisor`)

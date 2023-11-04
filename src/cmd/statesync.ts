@@ -15,38 +15,44 @@ export const statesyncCommand = new Command('statesync')
             console.error('Either --rpc or --chain is required.\n')
             command.help({error: true})
         }
+
         try {
-            let rpc = options.rpc;
-            if (!rpc) {
-                rpc = await findGoodRpc(options.chain)
-                console.log('RPC!', rpc)
-            }
-
-            const latest = await getBlock(rpc);
-
-            const latestHeight = parseInt(latest.result.block.header.height)
-            const ssHeight = Math.round((latestHeight - 3000)/1000)*1000
-            const {data: ssBlock} = await axios.get(`${rpc.replace(/\/$/, '')}/block?height=${ssHeight}`);
-            const ssHash = ssBlock.result.block_id.hash
-
-            if (options.reset) {
-                await unsafeResetAll()
-            };
-
-            const config = getConfig();
-
-            config.statesync.enable = true;
-            config.statesync.rpc_servers = `${rpc},${rpc}`
-            config.statesync.trust_height = ssHeight;
-            config.statesync.trust_hash = ssHash;
-            config.statesync.discovery_time = '30s';
-
-            saveConfig(config);
-            console.log(`Trust Height: ${ssHeight}`)
-            console.log(`Trust Hash: ${ssHash}`)
-            console.log(`Statesync configured, ready to start!`)
-
+            const chain = options.chain;
+            const rpc = options.rpc;
+            const reset = options.reset;
+            await setupStatesync(chain, rpc, reset)
         } catch(e: any) {
             console.error('Error:', e.toString())
         }
     })
+
+export const setupStatesync = async (chain: string, rpcInput?: string, reset = false) => {
+    const rpc = rpcInput ? rpcInput : await findGoodRpc(chain)
+    if (!rpc) throw "Unable to find RPC server to sync with";
+    console.log('Configuring Statesync with RPC:', rpc)
+
+    const latest = await getBlock(rpc);
+
+    const latestHeight = parseInt(latest.result.block.header.height)
+    const ssHeight = Math.round((latestHeight - 3000)/1000)*1000
+    const {data: ssBlock} = await axios.get(`${rpc.replace(/\/$/, '')}/block?height=${ssHeight}`);
+    const ssHash = ssBlock.result.block_id.hash
+
+    if (reset) {
+        console.log('Unsafe Resetting Chain Data!')
+        await unsafeResetAll()
+    };
+
+    const config = getConfig();
+
+    config.statesync.enable = true;
+    config.statesync.rpc_servers = `${rpc},${rpc}`
+    config.statesync.trust_height = ssHeight;
+    config.statesync.trust_hash = ssHash;
+    config.statesync.discovery_time = '30s';
+
+    saveConfig(config);
+    console.log(`Trust Height: ${ssHeight}`)
+    console.log(`Trust Hash: ${ssHash}`)
+    console.log(`Statesync configured, ready to start!`)
+}

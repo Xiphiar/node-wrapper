@@ -11,6 +11,8 @@ export class Config {
     'build_cmd': string = 'make install';
     'build_output': string = `${process.env.HOME}/go/bin`;
     'hide_log_p2p_info': boolean = true;
+    'auto_recover': boolean = false;
+    'registry_id': string = '';
 }
 
 
