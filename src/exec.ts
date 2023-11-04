@@ -29,6 +29,10 @@ export const readDeb = (path: string): Promise<{controlFile: any, fileList: stri
     });
 }
 
+const isP2p = (str: string) => {
+    return /INF.*module.....p2p/.test(str)
+}
+
 const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) => {
     const config = getWrapConfig();
     const bin = config.app_binary_path
@@ -38,7 +42,7 @@ const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) 
     const processStdOut = (data: Buffer) => {
         const entry = data.toString().trim()
 
-        if (config.hide_log_p2p_info && entry.includes('module=p2p') && entry.includes(' INF ')) return;
+        if (config.hide_log_p2p_info && isP2p(entry)) return;
 
         console.log(entry)
         onStdOut(entry)
@@ -47,7 +51,7 @@ const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) 
     const processStdErr = (data: Buffer) => {
         const entry = data.toString().trim()
 
-        if (config.hide_log_p2p_info && entry.includes('module=p2p') && entry.includes(' INF ')) return;
+        if (config.hide_log_p2p_info && isP2p(entry)) return;
 
         // All node output is on stderr 🤷 
         console.log(entry)
