@@ -34,36 +34,27 @@ const isP2p = (str: string) => {
     return /INF.*module.....p2p/.test(str)
 }
 
-const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) => {
+const runApp = (onLog: (data: string)=>void) => {
     const config = getWrapConfig();
     const bin = config.app_binary_path
     const command = config.app_start_subcommand || 'start'
     const args = config.app_args ? config.app_args.split(' ') : []
 
-    const processStdOut = (data: Buffer) => {
+    const processLog = (data: Buffer) => {
         const entry = data.toString().trim()
 
         if (config.hide_log_p2p_info && isP2p(entry)) return;
 
         console.log(entry)
-        onStdOut(entry)
-    }
-
-    const processStdErr = (data: Buffer) => {
-        const entry = data.toString().trim()
-
-        if (config.hide_log_p2p_info && isP2p(entry)) return;
-
-        // All node output is on stderr 🤷 
-        console.log(entry)
-        onStdOut(entry)
+        onLog(entry)
     }
 
     console.log('Starting App', bin, args.join(' '))
     const app = spawn(bin, [command, ...args]);
 
-    app.stdout.on('data', processStdOut);
-    app.stderr.on('data', processStdErr);
+    // All node output is on stderr 🤷 
+    app.stdout.on('data', processLog);
+    app.stderr.on('data', processLog);
 
     app.on('exit', (code)=>{
         if (!code) return;
@@ -77,23 +68,25 @@ const runApp = (onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) 
 
 export class RunApp {
     private child: ChildProcessWithoutNullStreams;
-    private onStdOut: (data: string)=>void;
-    private onStdErr: (data: string)=>void;
+    private onLog: (data: string)=>void;
     private wrapConfig = getWrapConfig();
 
-    constructor(onStdOut: (data: string)=>void, onStdErr: (data: string)=>void) {
-        this.child = runApp(onStdOut, onStdErr)
-        this.onStdOut = onStdOut;
-        this.onStdErr = onStdErr;
+    constructor(onLog: (data: string)=>void) {
+        this.onLog = onLog;
 
         this.start = this.start.bind(this)
+        this.stop = this.stop.bind(this)
         this.restart = this.restart.bind(this)
+
+        this.child = runApp(this.handleLog)
+
     }
 
-    private handleErrLog = (logEntry: string) => {
-        this.onStdErr(logEntry)
+    private handleLog = (logEntry: string) => {
+        this.onLog(logEntry)
 
         if ((this.wrapConfig.auto_recover || false) && logEntry.includes('ERR CONSENSUS FAILURE!!!')) {
+            console.log('Found consensus failure, starting reset and statesync.');
             this.stop();
             setupStatesync(this.wrapConfig.registry_id, undefined, true).then(()=>{
                 this.start()
@@ -102,7 +95,7 @@ export class RunApp {
     }
 
     private start() {
-        this.child = runApp(this.onStdOut, this.handleErrLog)
+        this.child = runApp(this.handleLog)
     }
 
     private stop() {

@@ -16,7 +16,7 @@ export const startWrapper = () => {
         res.send(`<pre>${convert.toHtml(logBuffer.getLog())}</pre>`)
     });
 
-    const app = new RunApp(logBuffer.addLog, logBuffer.addLog)
+    const app = new RunApp(logBuffer.addLog)
     server.get('/restart', async (req, res) => {
         console.log('Received restart request, terminating app process...')
         app.restart()
