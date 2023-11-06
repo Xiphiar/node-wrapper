@@ -88,9 +88,10 @@ export class RunApp {
         if ((this.wrapConfig.auto_recover || false) && logEntry.includes('ERR CONSENSUS FAILURE!!!')) {
             console.log('Found consensus failure, starting reset and statesync.');
             this.stop();
-            setupStatesync(this.wrapConfig.registry_id, undefined, true).then(()=>{
-                this.start()
-            });
+            (async (registryId: string, startCmd: ()=>any)=>{
+                await setupStatesync(registryId, undefined, true)
+                startCmd()
+            })(this.wrapConfig.registry_id, this.start)
         }
     }
 
