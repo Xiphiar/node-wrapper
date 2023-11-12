@@ -85,7 +85,7 @@ export class RunApp {
     private handleLog = (logEntry: string) => {
         this.onLog(logEntry)
 
-        if ((this.wrapConfig.auto_recover || false) && /ERR.*CONSENSUS.*FAILURE/.test(logEntry)) {
+        if ((this.wrapConfig.auto_recover || false) && (/ERR.*CONSENSUS.*FAILURE/.test(logEntry) || /panic.*precommit.*step.*prevoted.*for.*an.*invalid.*block.*wrong.*Block.Header.AppHash/.test(logEntry))) {
             console.log('Found consensus failure, starting reset and statesync.');
             this.stop();
             (async (registryId: string, startCmd: ()=>any)=>{
